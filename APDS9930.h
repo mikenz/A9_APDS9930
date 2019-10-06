@@ -10,14 +10,11 @@
  * relies on the Arduino Wire (I2C) library. to use the library, instantiate an
  * APDS9930 object, call init(), and call the appropriate functions.
  */
- 
+
 #ifndef APDS9930_H
 #define APDS9930_H
 
-#include <Arduino.h>
-
-/* Debug */
-#define DEBUG                   0
+#include "api_hal_i2c.h"
 
 /* APDS-9930 I2C address */
 #define APDS9930_I2C_ADDR       0x39
@@ -153,16 +150,14 @@ class APDS9930 {
 public:
 
     /* Initialization methods */
-    APDS9930();
-    ~APDS9930();
-    bool init();
+    bool init(I2C_ID_t i2c);
     uint8_t getMode();
     bool setMode(uint8_t mode, uint8_t enable);
-    
+
     /* Turn the APDS-9930 on and off */
     bool enablePower();
     bool disablePower();
-    
+
     /* Enable or disable specific sensors */
     bool enableLightSensor(bool interrupts = false);
     bool disableLightSensor();
@@ -174,7 +169,7 @@ public:
     bool setLEDDrive(uint8_t drive);
     // uint8_t getGestureLEDDrive();
     // bool setGestureLEDDrive(uint8_t drive);
-    
+
     /* Gain control */
     uint8_t getAmbientLightGain();
     bool setAmbientLightGain(uint8_t gain);
@@ -183,24 +178,24 @@ public:
     bool setProximityDiode(uint8_t drive);
     uint8_t getProximityDiode();
 
-    
+
     /* Get and set light interrupt thresholds */
     bool getLightIntLowThreshold(uint16_t &threshold);
     bool setLightIntLowThreshold(uint16_t threshold);
     bool getLightIntHighThreshold(uint16_t &threshold);
     bool setLightIntHighThreshold(uint16_t threshold);
-    
+
     /* Get and set interrupt enables */
     uint8_t getAmbientLightIntEnable();
     bool setAmbientLightIntEnable(uint8_t enable);
     uint8_t getProximityIntEnable();
     bool setProximityIntEnable(uint8_t enable);
-    
+
     /* Clear interrupts */
     bool clearAmbientLightInt();
     bool clearProximityInt();
     bool clearAllInts();
-    
+
     /* Proximity methods */
     bool readProximity(uint16_t &val);
 
@@ -211,7 +206,7 @@ public:
     unsigned long ulongAmbientToLux(uint16_t Ch0, uint16_t Ch1);
     bool readCh0Light(uint16_t &val);
     bool readCh1Light(uint16_t &val);
-    
+
 //private:
 
     /* Proximity Interrupt Threshold */
@@ -219,13 +214,16 @@ public:
     bool setProximityIntLowThreshold(uint16_t threshold);
     uint16_t getProximityIntHighThreshold();
     bool setProximityIntHighThreshold(uint16_t threshold);
-    
+
     /* Raw I2C Commands */
     bool wireWriteByte(uint8_t val);
     bool wireWriteDataByte(uint8_t reg, uint8_t val);
     bool wireWriteDataBlock(uint8_t reg, uint8_t *val, unsigned int len);
     bool wireReadDataByte(uint8_t reg, uint8_t &val);
-    int wireReadDataBlock(uint8_t reg, uint8_t *val, unsigned int len);
+
+ private:
+  I2C_ID_t _i2c;
+  I2C_Config_t _i2cConfig;
 };
 
 #endif
